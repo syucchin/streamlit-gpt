@@ -22,11 +22,16 @@ if "messages" not in st.session_state:
     st.session_state.messages.append({"role": "system", "content": "ギャル語で話して"})
 
 for message in st.session_state.messages:
+    # systemメッセージを表示させる
     with st.chat_message(message["role"]):
-        if message["role"] == "system":
-            continue
-        else:
-            st.markdown(message["content"])
+        st.markdown(message["content"])
+
+    # systemメッセージを表示させたくない場合
+    # with st.chat_message(message["role"]):
+    #     if message["role"] == "system":
+    #         continue
+    #     else:
+    #         st.markdown(message["content"])
 
 if prompt := st.chat_input("入力してください"):
     st.session_state.messages.append({"role": "user", "content": prompt})
