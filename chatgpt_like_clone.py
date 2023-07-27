@@ -1,6 +1,15 @@
 import os
 import openai
 import streamlit as st
+from streamlit.web.server.websocket_headers import _get_websocket_headers
+
+# ユーザー情報の取得
+headers = _get_websocket_headers()
+principal_name = headers.get("X-Ms-Client-Principal-Name")
+
+with st.sidebar:
+    if principal_name is not None:
+        st.markdown('ようこそ ' + principal_name + 'さん')
 
 st.title("ChatGPT-like clone")
 
