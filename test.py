@@ -7,14 +7,37 @@ from streamlit.web.server.websocket_headers import _get_websocket_headers
 headers = _get_websocket_headers()
 principal_name = headers.get("X-Ms-Client-Principal-Name")
 
-# ヘッダからユーザー情報を取得できなければ、Guest として表示
+# スレッド番号がなければ1を入れる
+st.session_state.setdefault("thread_num", "1")
+
+# スレッドの選択。ボタンから呼ばれる
+def select_thread(num):
+    st.session_state["thread_num"] = num
+    st.session_state.messages = st.session_state[f"messages{num}"]
+
+
+# 初期のタイトル設定
+for i in range(1, 11):
+    st.session_state.setdefault(f"title{i}", "New Chat")
+
+# 初期スレッドメッセージの設定
+message_data = []
+
+for i in range(1, 11):  # 1から10までループ
+    key = f"messages{i}"  # キーを生成（messages1, messages2, ... , messages10）
+    st.session_state.setdefault(key, message_data)
+
 with st.sidebar:
+    # ヘッダからユーザー情報を取得できなければ、Guest として表示
     if principal_name is not None:
         st.markdown('ようこそ ' + principal_name + 'さん')
     else:
         st.markdown('ようこそ Guest さん')
 
-st.title("Streamlit ちゃっとくん")
+    for i in range(1, 11):
+        st.button(label=st.session_state[f"title{i}"], key=i, on_click=select_thread, args=str(i))
+
+st.title("Streamlit ChatKun")
 
 API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
 RESOURCE_ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT_FQDN")
@@ -33,6 +56,14 @@ if "openai_model" not in st.session_state:
 if "messages" not in st.session_state:
     st.session_state.messages = []
     st.session_state.messages.append({"role": "system", "content": "ギャル語で話して"})
+    print(st.session_state.messages)
+
+i = st.session_state["thread_num"]
+key = f"messages{i}"  # キーを生成
+if key in st.session_state:
+    st.session_state[key] = st.session_state.messages.copy()
+    # st.session_state.messages.extend(st.session_state[key])
+    print(st.session_state.messages)
 
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
@@ -43,6 +74,7 @@ for message in st.session_state.messages:
 
 if prompt := st.chat_input("入力してください"):
     st.session_state.messages.append({"role": "user", "content": prompt})
+    st.session_state[f"messages{st.session_state['thread_num']}"] = st.session_state.messages
     with st.chat_message("user"):
         st.markdown(prompt)
 
@@ -62,5 +94,7 @@ if prompt := st.chat_input("入力してください"):
             message_placeholder.markdown(full_response + "▌")
         message_placeholder.markdown(full_response)
     st.session_state.messages.append({"role": "assistant", "content": full_response})
+
+st.session_state[key] = st.session_state.messages
 
 print(st.session_state)
