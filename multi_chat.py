@@ -23,7 +23,7 @@ for i in range(0, 10):
 message_data = [{"role": "system", "content": "ギャル語で話して"}]
 
 for i in range(0, 10):  # 1から10までループ
-    key = f"thread{i}"  # キーを生成（messages1, messages2, ... , messages10）
+    key = f"thread{i}"  # キーを生成（thread1, thread2, ... , thread10）
     st.session_state.setdefault(key, message_data.copy())
 
 with st.sidebar:
@@ -36,7 +36,7 @@ with st.sidebar:
     for i in range(0, 10):
         st.button(label=st.session_state[f"thread_name{i}"], key=i, on_click=select_thread, args=str(i))
 
-st.title("Streamlit ChatKun")
+st.title("Streamlit Chat Kun")
 
 API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
 RESOURCE_ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT_FQDN")
@@ -48,8 +48,8 @@ openai.api_base = RESOURCE_ENDPOINT           #アクセスエンドポイント
 openai.api_version = "2023-03-15-preview"     #適合するAPIバージョンを指定
 
 if "openai_model" not in st.session_state:
-    # st.session_state["openai_model"] = "gpt-4"
-    st.session_state["openai_model"] = "gpt-35-turbo-16k"
+    st.session_state["openai_model"] = "gpt-4"
+    # st.session_state["openai_model"] = "gpt-35-turbo-16k"
 
 if "messages" not in st.session_state:
     st.session_state.messages = st.session_state[f"thread{st.session_state['thread_num']}"].copy()
